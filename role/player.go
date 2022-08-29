@@ -8,8 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"log"
 	"mota/maps"
-	"runtime"
-	"sync"
 )
 
 type Player struct {
@@ -24,22 +22,15 @@ type Player struct {
 }
 
 func (p *Player) LoadImages(screen *ebiten.Image) {
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		imagePath := fmt.Sprintf("./image/main/resource_%v.png", 0)
-		img, _, err := ebitenutil.NewImageFromFile(imagePath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(p.X*maps.ImageLarge, p.Y*maps.ImageLarge)
-		op.GeoM.Scale(1, 1)
-		screen.DrawImage(img, op)
-		wg.Done()
-		runtime.GC()
-	}()
-	wg.Wait()
+	imagePath := fmt.Sprintf("./image/main/resource_%v.png", 0)
+	img, _, err := ebitenutil.NewImageFromFile(imagePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(p.X*maps.ImageLarge, p.Y*maps.ImageLarge)
+	op.GeoM.Scale(1, 1)
+	screen.DrawImage(img, op)
 }
 
 func (p *Player) PlayerStatus() {
