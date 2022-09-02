@@ -13,7 +13,7 @@ const ImageLarge = 47
 const FloorNum = 50
 
 // Map 地图初始数据
-var Map = [FloorNum][YNUm][XNUm]int{
+var Map = [FloorNum][XNUm][YNUm]int{
 	{
 		{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 		{2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
@@ -194,3 +194,26 @@ var Map = [FloorNum][YNUm][XNUm]int{
 // MapWidth 地图长宽
 const MapWidth = XNUm * ImageLarge
 const MapHeight = YNUm * ImageLarge
+
+// Image 快类型数据
+var Image = map[int]map[string]interface{}{
+	0:  {"imagePath": "", "canMove": false, "canDestroy": false, "type": "wall"},
+	1:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "road"},
+	2:  {"imagePath": "", "canMove": false, "canDestroy": false, "type": "wall"},
+	5:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "yellowDoor"},
+	6:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "blueDoor"},
+	7:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "RedDoor"},
+	8:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "stairs"},
+	20: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	21: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	24: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	27: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	28: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	30: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
+	80: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "yellowKey"},
+	81: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "BlueKey"},
+	82: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "RedKey"},
+	84: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "medicine"},
+	85: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "redTone", "addAttack": 10},
+	86: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "blueTone", "addDefence": 10},
+}
