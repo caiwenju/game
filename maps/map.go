@@ -9,11 +9,17 @@ const YNUm = 13
 // ImageLarge 图片长宽
 const ImageLarge = 47
 
+// Panel 控制面板宽度
+const Panel = 47
+
+// PanelNum 控制面板数量
+const PanelNum = 4
+
 // FloorNum 楼层数量
 const FloorNum = 50
 
 // Map 地图初始数据
-var Map = [FloorNum][XNUm][YNUm]int{
+var Map = [FloorNum][YNUm][XNUm]int{
 	{
 		{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 		{2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
@@ -193,27 +199,77 @@ var Map = [FloorNum][XNUm][YNUm]int{
 
 // MapWidth 地图长宽
 const MapWidth = XNUm * ImageLarge
-const MapHeight = YNUm * ImageLarge
+const MapHeight = YNUm*ImageLarge + Panel*PanelNum
 
 // Image 快类型数据
 var Image = map[int]map[string]interface{}{
-	0:  {"imagePath": "", "canMove": false, "canDestroy": false, "type": "wall"},
-	1:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "road"},
-	2:  {"imagePath": "", "canMove": false, "canDestroy": false, "type": "wall"},
-	5:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "yellowDoor"},
-	6:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "blueDoor"},
-	7:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "RedDoor"},
-	8:  {"imagePath": "", "canMove": true, "canDestroy": false, "type": "stairs"},
-	20: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	21: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	24: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	27: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	28: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	30: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "master"},
-	80: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "yellowKey"},
-	81: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "BlueKey"},
-	82: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "RedKey"},
-	84: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "medicine"},
-	85: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "redTone", "addAttack": 10},
-	86: {"imagePath": "", "canMove": true, "canDestroy": false, "type": "blueTone", "addDefence": 10},
+	1:  {"imagePath": "", "type": "road"},
+	2:  {"imagePath": "", "type": "wall", "canDestroy": false},
+	5:  {"imagePath": "", "type": "door", "color": "yellow"},
+	6:  {"imagePath": "", "type": "door", "color": "blue"},
+	7:  {"imagePath": "", "type": "door", "color": "red"},
+	8:  {"imagePath": "", "type": "stairs", "direct": "up"},
+	9:  {"imagePath": "", "type": "stairs", "direct": "down"},
+	11: {"imagePath": "", "type": "door", "color": "master"},
+	12: {"imagePath": "", "type": "door", "direct": "master"},
+	20: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	21: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	24: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	27: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	28: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	29: {"imagePath": "", "type": "master", "attack": 20, "defense": 20, "health": 100},
+	30: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	37: {"imagePath": "", "type": "master", "attack": 50, "defense": 10, "health": 100},
+	38: {"imagePath": "", "type": "master", "attack": 50, "defense": 10, "health": 100},
+	60: {"imagePath": "", "type": "npc"},
+	61: {"imagePath": "", "type": "npc"},
+	62: {"imagePath": "", "type": "npc"},
+	63: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	64: {"imagePath": "", "type": "master", "attack": 10, "defense": 10, "health": 100},
+	65: {"imagePath": "", "type": "store"},
+	66: {"imagePath": "", "type": "store"},
+	67: {"imagePath": "", "type": "store"},
+	80: {"imagePath": "", "type": "Key", "color": "yellow", "num": 1},
+	81: {"imagePath": "", "type": "Key", "color": "blue", "num": 1},
+	82: {"imagePath": "", "type": "Key", "color": "red", "num": 1},
+	83: {"imagePath": "", "type": "medicine", "health": 1000},
+	84: {"imagePath": "", "type": "medicine", "health": 2000},
+	85: {"imagePath": "", "type": "tone", "Attack": 10},
+	86: {"imagePath": "", "type": "tone", "Defence": 10},
+	87: {"imagePath": "", "type": "tone", "Attack": 1000},
+	88: {"imagePath": "", "type": "tone", "Defence": 1000},
+	98: {"imagePath": "", "type": "tone"},
+}
+
+// PersonPosition 每层人物的起始位置
+var PersonPosition = map[int][2]int{
+	0:  {6, 11},
+	1:  {6, 11},
+	2:  {1, 2},
+	3:  {2, 11},
+	4:  {11, 10},
+	5:  {2, 11},
+	6:  {1, 2},
+	7:  {11, 10},
+	8:  {1, 2},
+	9:  {6, 2},
+	10: {1, 10},
+	11: {6, 11},
+	12: {6, 11},
+	13: {6, 11},
+	14: {6, 11},
+	15: {6, 11},
+	16: {6, 11},
+	17: {6, 11},
+	18: {6, 11},
+	19: {6, 11},
+	20: {6, 11},
+}
+
+// BackGroundPanel 背景面板
+var BackGroundPanel = [4][XNUm]int{
+	{99, 104, 104, 104, 104, 99, 99, 99, 99, 99, 99, 99, 99},
+	{100, 104, 104, 104, 104, 99, 99, 99, 99, 99, 99, 99, 99},
+	{101, 104, 104, 104, 104, 99, 99, 99, 99, 99, 99, 99, 99},
+	{102, 104, 104, 104, 104, 99, 99, 99, 99, 99, 99, 99, 99},
 }
