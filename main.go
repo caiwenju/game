@@ -8,7 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/mobile"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -268,11 +267,7 @@ func (f File) Read(p []byte) (n int, err error) {
 
 func (f File) re() []byte {
 	// 打开文件
-	file, err := os.ReadFile("./sounds/bgm1.ogg")
-	if err != nil {
-		fmt.Println("ReadFile err :", err)
-		return []byte{}
-	}
+	file, _ := os.ReadFile("./sounds/bgm1.ogg")
 	return file
 }
 
@@ -312,5 +307,7 @@ func main() {
 	ebiten.SetWindowSize(MapWidth, MapHeight)
 	ebiten.SetWindowTitle("魔塔")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
-	mobile.SetGame(&Game{})
+	if err := ebiten.RunGame(&Game{}); err != nil {
+		log.Fatal(err)
+	}
 }

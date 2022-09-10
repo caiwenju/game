@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
 	"mota/maps"
+	_ "mota/statik"
 	"runtime"
 	"sync"
 )
