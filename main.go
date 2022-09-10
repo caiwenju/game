@@ -241,6 +241,10 @@ func (p *Player) DrawPersonInfo(screen *ebiten.Image) {
 	text.Draw(screen, strconv.Itoa(p.Attack), normalFont, ImageLarge, 15*ImageLarge-20, color.White)
 	text.Draw(screen, strconv.Itoa(p.Defense), normalFont, ImageLarge, 16*ImageLarge-20, color.White)
 	text.Draw(screen, strconv.Itoa(p.Health), normalFont, ImageLarge, 17*ImageLarge-20, color.White)
+	text.Draw(screen, strconv.Itoa(100), normalFont, 8*ImageLarge, 14*ImageLarge-20, color.White)
+	text.Draw(screen, strconv.Itoa(p.YellowKey), normalFont, 8*ImageLarge, 15*ImageLarge-20, color.White)
+	text.Draw(screen, strconv.Itoa(p.BlueKey), normalFont, 8*ImageLarge, 16*ImageLarge-20, color.White)
+	text.Draw(screen, strconv.Itoa(p.RedKey), normalFont, 8*ImageLarge, 17*ImageLarge-20, color.White)
 
 }
 
