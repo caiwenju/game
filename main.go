@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"embed"
-	_ "embed"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -13,13 +15,20 @@ import (
 	"golang.org/x/image/font/opentype"
 	"image/color"
 	_ "image/png"
-	"io"
 	"log"
 	"math"
 	. "mota/maps"
+	"mota/sounds"
 	"mota/tools"
-	"os"
 	"strconv"
+)
+
+const (
+	sampleRate     = 48000 // 采样率
+	bytesPerSample = 4     // 每次采样读取的字节数
+
+	introLengthInSecond = 0  // 音频开始的秒数
+	loopLengthInSecond  = 58 // 音频循环播放的秒数，bytesPerSample 会影响他
 )
 
 var CurrentMap [FloorNum][YNUm][XNUm]int
@@ -237,18 +246,21 @@ func (p *Player) DrawPersonInfo(screen *ebiten.Image) {
 		Hinting: font.HintingFull,
 	})
 	text.Draw(screen, "魔塔", normalFont, 0, 14*ImageLarge-20, color.Black)
-	text.Draw(screen, strconv.Itoa(Floor), normalFont, ImageLarge+10, 14*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.Attack), normalFont, ImageLarge, 15*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.Defense), normalFont, ImageLarge, 16*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.Health), normalFont, ImageLarge, 17*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(100), normalFont, 8*ImageLarge, 14*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.YellowKey), normalFont, 8*ImageLarge, 15*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.BlueKey), normalFont, 8*ImageLarge, 16*ImageLarge-20, color.White)
-	text.Draw(screen, strconv.Itoa(p.RedKey), normalFont, 8*ImageLarge, 17*ImageLarge-20, color.White)
+	text.Draw(screen, strconv.Itoa(Floor), normalFont, ImageLarge+10, 14*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Attack), normalFont, ImageLarge, 15*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Defense), normalFont, ImageLarge, 16*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Health), normalFont, ImageLarge, 17*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(100), normalFont, 8*ImageLarge, 14*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.YellowKey), normalFont, 8*ImageLarge, 15*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.BlueKey), normalFont, 8*ImageLarge, 16*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.RedKey), normalFont, 8*ImageLarge, 17*ImageLarge-15, color.White)
 
 }
 
 var person Player
+
+var backGround *audio.Player
+var audioContext *audio.Context
 
 func init() {
 	// 	初始化地图信息
@@ -256,29 +268,21 @@ func init() {
 
 	// 初始化人物信息
 	person = Player{X: PersonPosition[Floor][0], Y: PersonPosition[Floor][1], YellowKey: 111, BlueKey: 111, RedKey: 111, Attack: 100, Defense: 100, Health: 1000}
-}
 
-type File struct {
-}
-
-type ReadSeeker struct {
-	io.ReadSeeker
-}
-
-func (f File) Read(p []byte) (n int, err error) {
-	return len(p), nil
-}
-
-func (f File) re() []byte {
-	// 打开文件
-	file, _ := os.ReadFile("./sounds/bgm1.ogg")
-	return file
+	// 初始化背景音乐
+	audioContext = audio.NewContext(sampleRate)
+	Bgm1Ogg, _ := vorbis.DecodeWithoutResampling(bytes.NewReader(sounds.Bgm1Ogg))
+	loop := audio.NewInfiniteLoopWithIntro(Bgm1Ogg, introLengthInSecond*bytesPerSample*sampleRate, loopLengthInSecond*bytesPerSample*sampleRate)
+	backGround, _ = audioContext.NewPlayer(loop)
 }
 
 func (g *Game) Update() error {
 
 	// 处理人物状态
 	person.PlayerStatus()
+
+	// 播放背景音乐
+	backGround.Play()
 	return nil
 }
 
@@ -292,15 +296,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	tools.DrawBackGround(BackGroundPanel, screen)
 	// 绘制功能面板数据
 	person.DrawPersonInfo(screen)
-	//// 播放背景音乐
-	//var reader io.Reader
-	//f := File{}
-	//reader = f
-	//_, _ = mp3.DecodeWithSampleRate(44100, reader)
-	//bgmStream, _ := reader.Read(f.re())
-	//s := audio.NewInfiniteLoop(1, int64(bgmStream))
-	//d := audio.Player{}
-	//d.Play()
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
