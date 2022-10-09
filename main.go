@@ -17,6 +17,7 @@ import (
 	_ "image/png"
 	"log"
 	"math"
+	"mota/image"
 	. "mota/maps"
 	"mota/sounds"
 	"mota/tools"
@@ -57,10 +58,10 @@ type Player struct {
 }
 
 func (p *Player) LoadImages(screen *ebiten.Image) {
-	imagePath := fmt.Sprintf("./image/main/resource_%v.png", 0)
-	img, _, err := ebitenutil.NewImageFromFile(imagePath)
+	imagePath := fmt.Sprintf("main/resource_%v.png", 0)
+	img, _, err := ebitenutil.NewImageFromFileSystem(image.MainFs, imagePath)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(p.X*ImageLarge), float64(p.Y*ImageLarge))
@@ -283,6 +284,7 @@ func (g *Game) Update() error {
 
 	// 播放背景音乐
 	backGround.Play()
+
 	return nil
 }
 

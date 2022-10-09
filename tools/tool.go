@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"log"
+	"mota/image"
 	"mota/maps"
 	"runtime"
 	"sync"
@@ -21,10 +21,10 @@ func DrawMap(floorNum int, mapInfo [maps.FloorNum][maps.YNUm][maps.XNUm]int, scr
 			x := x
 			y := y
 			go func() {
-				imagePath := fmt.Sprintf("./image/main/resource_%v.png", imageValue)
-				img, _, err := ebitenutil.NewImageFromFile(imagePath)
+				imagePath := fmt.Sprintf("main/resource_%v.png", imageValue)
+				img, _, err := ebitenutil.NewImageFromFileSystem(image.MainFs, imagePath)
 				if err != nil {
-					log.Fatal(err)
+					return
 				}
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(x*maps.ImageLarge), float64(y*maps.ImageLarge))
@@ -48,10 +48,10 @@ func DrawBackGround(Panel [4][maps.XNUm]int, screen *ebiten.Image) {
 			x := x
 			y := y
 			go func() {
-				imagePath := fmt.Sprintf("./image/main/resource_%v.png", imageValue)
-				img, _, err := ebitenutil.NewImageFromFile(imagePath)
+				imagePath := fmt.Sprintf("main/resource_%v.png", imageValue)
+				img, _, err := ebitenutil.NewImageFromFileSystem(image.MainFs, imagePath)
 				if err != nil {
-					log.Fatal(err)
+					return
 				}
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(x*maps.ImageLarge), float64(y*maps.ImageLarge)+maps.ImageLarge*maps.YNUm)
