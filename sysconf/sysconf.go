@@ -11,3 +11,5 @@ const PLAYER_DEF = 8
 const PLAYER_MDEF = 0
 const PLAYER_GOLD = 0
 const PLAYER_EXP = 0
+
+var Floor = 1
