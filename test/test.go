@@ -1,9 +1,12 @@
-package player
+package testpackage
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -14,12 +17,51 @@ import (
 	"log"
 	"math"
 	"mota/image"
-	"mota/maps"
-	"mota/sysconf"
+	"mota/sounds"
+	"mota/tools"
 	"strconv"
 )
+main
+
+import (
+"bytes"
+"embed"
+"fmt"
+"github.com/hajimehoshi/ebiten/v2"
+"github.com/hajimehoshi/ebiten/v2/audio"
+"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
+"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
+"github.com/hajimehoshi/ebiten/v2/inpututil"
+"github.com/hajimehoshi/ebiten/v2/text"
+"golang.org/x/image/font"
+"golang.org/x/image/font/opentype"
+"image/color"
+_ "image/png"
+"log"
+"math"
+"mota/image"
+. "mota/maps"
+"mota/sounds"
+"mota/tools"
+"strconv"
+)
+
+const (
+	sampleRate     = 48000 // 采样率
+	bytesPerSample = 4     // 每次采样读取的字节数
+
+	introLengthInSecond = 0  // 音频开始的秒数
+	loopLengthInSecond  = 58 // 音频循环播放的秒数，bytesPerSample 会影响他
+)
+
+var CurrentMap [FloorNum][YNUm][XNUm]int
+
+var Floor = 1
 
 var lastPosition [2]int
+
+type Game struct{}
 
 type Player struct {
 	X         int
@@ -38,8 +80,6 @@ type Player struct {
 	image     *embed.FS
 }
 
-var Person Player
-
 func (p *Player) LoadImages(screen *ebiten.Image) {
 	imagePath := fmt.Sprintf("main/resource_%v.png", 0)
 	img, _, err := ebitenutil.NewImageFromFileSystem(image.MainFs, imagePath)
@@ -47,7 +87,7 @@ func (p *Player) LoadImages(screen *ebiten.Image) {
 		return
 	}
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(p.X*maps.ImageLarge), float64(p.Y*maps.ImageLarge))
+	op.GeoM.Translate(float64(p.X*ImageLarge), float64(p.Y*ImageLarge))
 	op.GeoM.Scale(1, 1)
 	screen.DrawImage(img, op)
 }
@@ -80,15 +120,15 @@ func (p *Player) PlayerMove() {
 		p.X = nextX
 		p.Y = nextY
 		// 消除被销毁物
-		maps.CurrentMap[sysconf.Floor][nextY][nextX] = 1
+		CurrentMap[Floor][nextY][nextX] = 1
 	}
 }
 
 func (p *Player) MoveDeal(nextX int, nextY int) bool {
 
 	// 获取地图对象的基础信息
-	block := maps.CurrentMap[sysconf.Floor][nextY][nextX]
-	imageMap := maps.Image[block]
+	block := CurrentMap[Floor][nextY][nextX]
+	imageMap := Image[block]
 	imageType := imageMap["type"]
 	switch imageType {
 	case "road":
@@ -207,12 +247,12 @@ func (p *Player) CanKillMaster(masterAttack, masterDefense, masterHealth int) bo
 func (p *Player) MoveForCheckMap(imageMap map[string]interface{}) bool {
 
 	if imageMap["direct"] == "up" {
-		sysconf.Floor += 1
+		Floor += 1
 		lastPosition[0] = p.X
 		lastPosition[1] = p.Y
-		p.X, p.Y = maps.PersonPosition[sysconf.Floor][0], maps.PersonPosition[sysconf.Floor][1]
+		p.X, p.Y = PersonPosition[Floor][0], PersonPosition[Floor][1]
 	} else {
-		sysconf.Floor -= 1
+		Floor -= 1
 		p.X, p.Y = lastPosition[0], lastPosition[1]
 	}
 	return false
@@ -229,19 +269,70 @@ func (p *Player) DrawPersonInfo(screen *ebiten.Image) {
 		DPI:     72,
 		Hinting: font.HintingFull,
 	})
-	text.Draw(screen, "魔塔", normalFont, 0, 14*maps.ImageLarge-20, color.Black)
-	text.Draw(screen, strconv.Itoa(sysconf.Floor), normalFont, maps.ImageLarge+10, 14*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.Attack), normalFont, maps.ImageLarge, 15*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.Defense), normalFont, maps.ImageLarge, 16*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.Health), normalFont, maps.ImageLarge, 17*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(100), normalFont, 8*maps.ImageLarge, 14*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.YellowKey), normalFont, 8*maps.ImageLarge, 15*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.BlueKey), normalFont, 8*maps.ImageLarge, 16*maps.ImageLarge-15, color.White)
-	text.Draw(screen, strconv.Itoa(p.RedKey), normalFont, 8*maps.ImageLarge, 17*maps.ImageLarge-15, color.White)
+	text.Draw(screen, "魔塔", normalFont, 0, 14*ImageLarge-20, color.Black)
+	text.Draw(screen, strconv.Itoa(Floor), normalFont, ImageLarge+10, 14*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Attack), normalFont, ImageLarge, 15*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Defense), normalFont, ImageLarge, 16*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.Health), normalFont, ImageLarge, 17*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(100), normalFont, 8*ImageLarge, 14*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.YellowKey), normalFont, 8*ImageLarge, 15*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.BlueKey), normalFont, 8*ImageLarge, 16*ImageLarge-15, color.White)
+	text.Draw(screen, strconv.Itoa(p.RedKey), normalFont, 8*ImageLarge, 17*ImageLarge-15, color.White)
 
 }
 
-func Init() {
+var person Player
+
+var backGround *audio.Player
+var audioContext *audio.Context
+
+func init() {
+	// 	初始化地图信息
+	CurrentMap = Map
+
 	// 初始化人物信息
-	Person = Player{X: maps.PersonPosition[sysconf.Floor][0], Y: maps.PersonPosition[sysconf.Floor][1], YellowKey: 111, BlueKey: 111, RedKey: 111, Attack: 100, Defense: 100, Health: 1000}
+	person = Player{X: PersonPosition[Floor][0], Y: PersonPosition[Floor][1], YellowKey: 111, BlueKey: 111, RedKey: 111, Attack: 100, Defense: 100, Health: 1000}
+
+	// 初始化背景音乐
+	audioContext = audio.NewContext(sampleRate)
+	Bgm1Ogg, _ := vorbis.DecodeWithoutResampling(bytes.NewReader(sounds.Bgm1Ogg))
+	loop := audio.NewInfiniteLoopWithIntro(Bgm1Ogg, introLengthInSecond*bytesPerSample*sampleRate, loopLengthInSecond*bytesPerSample*sampleRate)
+	backGround, _ = audioContext.NewPlayer(loop)
 }
+
+func (g *Game) Update() error {
+
+	// 处理人物状态
+	person.PlayerStatus()
+
+	// 播放背景音乐
+	backGround.Play()
+
+	return nil
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+
+	// 绘制地图
+	tools.DrawMap(Floor, CurrentMap, screen)
+	// 绘制人物
+	person.LoadImages(screen)
+	// 绘制功能面板背景
+	tools.DrawBackGround(BackGroundPanel, screen)
+	// 绘制功能面板数据
+	person.DrawPersonInfo(screen)
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return MapWidth, MapHeight
+}
+
+func main() {
+	ebiten.SetWindowSize(MapWidth, MapHeight)
+	ebiten.SetWindowTitle("魔塔")
+	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
+	if err := ebiten.RunGame(&Game{}); err != nil {
+		log.Fatal(err)
+	}
+}
+

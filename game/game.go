@@ -2,20 +2,12 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"log"
 	"mota/draw"
-	"mota/init"
 	"mota/layout"
-	"mota/maps"
 	"mota/update"
 )
 
-type Game struct {
-}
-
-func init() {
-	init.Init()
-}
+type Game struct{}
 
 func (g *Game) Update() error {
 	update.Update()
@@ -30,11 +22,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return layout.Layout()
 }
 
-func Run() {
-	ebiten.SetWindowSize(maps.MapWidth, maps.MapHeight)
-	ebiten.SetWindowTitle("魔塔")
-	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
-	if err := ebiten.RunGame(&Game{}); err != nil {
-		log.Fatal(err)
-	}
+func NewGame() *Game {
+	g := &Game{}
+	return g
 }

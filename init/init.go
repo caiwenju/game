@@ -5,7 +5,7 @@ import (
 	"mota/sounds"
 )
 
-func Init() {
+func init() {
 	// 初始化人物信息
 	player.Init()
 
