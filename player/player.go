@@ -80,14 +80,14 @@ func (p *Player) PlayerMove() {
 		p.X = nextX
 		p.Y = nextY
 		// 消除被销毁物
-		maps.CurrentMap[sysconf.Floor][nextY][nextX] = 1
+		maps.Map[sysconf.Floor][nextY][nextX] = 1
 	}
 }
 
 func (p *Player) MoveDeal(nextX int, nextY int) bool {
 
 	// 获取地图对象的基础信息
-	block := maps.CurrentMap[sysconf.Floor][nextY][nextX]
+	block := maps.Map[sysconf.Floor][nextY][nextX]
 	imageMap := maps.Image[block]
 	imageType := imageMap["type"]
 	switch imageType {

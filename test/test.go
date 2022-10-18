@@ -1,4 +1,4 @@
-package testpackage
+package test
 
 import (
 	"bytes"
@@ -14,37 +14,14 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"image/color"
+	_ "image/png"
 	"log"
 	"math"
 	"mota/image"
+	. "mota/maps"
 	"mota/sounds"
 	"mota/tools"
 	"strconv"
-)
-main
-
-import (
-"bytes"
-"embed"
-"fmt"
-"github.com/hajimehoshi/ebiten/v2"
-"github.com/hajimehoshi/ebiten/v2/audio"
-"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
-"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
-"github.com/hajimehoshi/ebiten/v2/inpututil"
-"github.com/hajimehoshi/ebiten/v2/text"
-"golang.org/x/image/font"
-"golang.org/x/image/font/opentype"
-"image/color"
-_ "image/png"
-"log"
-"math"
-"mota/image"
-. "mota/maps"
-"mota/sounds"
-"mota/tools"
-"strconv"
 )
 
 const (
@@ -327,7 +304,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return MapWidth, MapHeight
 }
 
-func main() {
+func test() {
 	ebiten.SetWindowSize(MapWidth, MapHeight)
 	ebiten.SetWindowTitle("魔塔")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
@@ -335,4 +312,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-

@@ -273,5 +273,3 @@ var BackGroundPanel = [4][XNUm]int{
 	{101, 104, 104, 99, 99, 99, 99, 81, 104, 104, 99, 99, 99},
 	{102, 104, 104, 99, 99, 99, 99, 82, 104, 104, 99, 99, 99},
 }
-
-var CurrentMap [FloorNum][YNUm][XNUm]int

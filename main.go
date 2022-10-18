@@ -9,11 +9,10 @@ import (
 )
 
 func main() {
-	newGame := game.NewGame()
 	ebiten.SetWindowSize(maps.MapWidth, maps.MapHeight)
 	ebiten.SetWindowTitle("魔塔")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
-	if err := ebiten.RunGame(newGame); err != nil {
+	if err := ebiten.RunGame(game.G); err != nil {
 		log.Fatal(err)
 	}
 }

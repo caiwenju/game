@@ -22,7 +22,4 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return layout.Layout()
 }
 
-func NewGame() *Game {
-	g := &Game{}
-	return g
-}
+var G = &Game{}
