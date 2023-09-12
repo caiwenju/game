@@ -15,6 +15,7 @@ import (
 	"math"
 	"mota/image"
 	"mota/maps"
+	"mota/sounds"
 	"mota/sysconf"
 	"strconv"
 )
@@ -84,6 +85,11 @@ func (p *Player) PlayerMove() {
 	}
 }
 
+func (p *Player) FightMusic() {
+	// 战斗音效
+
+}
+
 func (p *Player) MoveDeal(nextX int, nextY int) bool {
 
 	// 获取地图对象的基础信息
@@ -126,6 +132,8 @@ func (p *Player) MoveForWall(imageMap map[string]interface{}) bool {
 }
 
 func (p *Player) MoveForDoor(imageMap map[string]interface{}) bool {
+	// 播放音乐
+	sounds.MusicObj.Play("openDoor")
 
 	doorColor := imageMap["color"]
 	canMove := false
@@ -159,6 +167,8 @@ func (p *Player) MoveForDoor(imageMap map[string]interface{}) bool {
 func (p *Player) MoveForFight(imageMap map[string]interface{}) bool {
 	canMove := false
 	if p.CanKillMaster(imageMap["attack"].(int), imageMap["defense"].(int), imageMap["health"].(int)) {
+		// 播放音乐
+		sounds.MusicObj.Play("hit")
 		// 削减血量 (假定人物先手攻击，回合数向下取整)
 		p.Health -= int(math.Floor(float64(imageMap["health"].(int)/(p.Attack-imageMap["defense"].(int))))) * imageMap["attack"].(int)
 		canMove = true
@@ -167,11 +177,15 @@ func (p *Player) MoveForFight(imageMap map[string]interface{}) bool {
 }
 
 func (p *Player) MoveForAddHealth(imageMap map[string]interface{}) bool {
+	// 播放音乐
+	sounds.MusicObj.Play("get")
 	p.Health += imageMap["health"].(int)
 	return true
 }
 
 func (p *Player) MoveForAddKey(imageMap map[string]interface{}) bool {
+	// 播放音乐
+	sounds.MusicObj.Play("get")
 	switch imageMap["color"] {
 	case "yellow":
 		p.YellowKey += imageMap["num"].(int)
@@ -184,6 +198,8 @@ func (p *Player) MoveForAddKey(imageMap map[string]interface{}) bool {
 }
 
 func (p *Player) MoveForAddAttackOrDefense(imageMap map[string]interface{}) bool {
+	// 播放音乐
+	sounds.MusicObj.Play("get")
 	val, ok := imageMap["Attack"]
 	if ok {
 		p.Attack += val.(int)
